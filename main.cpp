@@ -8,25 +8,27 @@
 #include <cstdlib>
 #include <sstream>
 #include <algorithm>  // Para sort()
+#include <queue>      // Para colas
+#include <stack>      // Para pilas
 
 using namespace std;
 using namespace sf;
 
 // Función para obtener los archivos de imagen (frames) desde una carpeta
 vector<string> getFramesFromFolder(const string &folder) {
-    vector<string> frameFiles;
-    WIN32_FIND_DATA fileData;
-    HANDLE hFind;
+    vector<string> frameFiles; // Vector para almacenar los nombres de los archivos de los frames del video o animación
+    WIN32_FIND_DATA fileData; // Estructura de datos de Windows para almacenar información sobre archivos encontrados
+    HANDLE hFind; // Manejador para la búsqueda de archivos en el sistema de archivos de Windows
 
     // Buscar archivos PNG en la carpeta
-    string searchPath = folder + "\\*.png";  
-    hFind = FindFirstFile(searchPath.c_str(), &fileData);
+    string searchPath = folder + "\\*.png";  //Se recolectaran todos los de extension .png
+    hFind = FindFirstFile(searchPath.c_str(), &fileData); // Inicia la búsqueda de archivos en el directorio especificado por `searchPath`
 
-    if (hFind != INVALID_HANDLE_VALUE) {
+    if (hFind != INVALID_HANDLE_VALUE) { // Verifica si se encontró al menos un archivo
         do {
-            // Agregar el archivo a la lista
+            // Agregar el archivo al vector
             frameFiles.push_back(folder + "\\" + fileData.cFileName);
-        } while (FindNextFile(hFind, &fileData));
+        } while (FindNextFile(hFind, &fileData)); // Continúa buscando más archivos en el directorio
         FindClose(hFind);
     }
 
@@ -56,7 +58,7 @@ struct NodoLogro {
     bool desbloqueado;
     NodoLogro *izq;
     NodoLogro *der;
-
+    // Constructor de la estructura NodoLogro
     NodoLogro(string nombre) : nombre(nombre), desbloqueado(false), izq(nullptr), der(nullptr) {}
 };
 
@@ -65,9 +67,7 @@ const int FILAS = 4;
 const int COLUMNAS = 4;
 Casilla tablero[FILAS][COLUMNAS];
 
-// Prototipo de la función calcular_puntos_casilla
 int calcular_puntos_casilla(int i, int j);
-
 // Inicializar el tablero
 void inicializar_tablero() {
     for (int i = 0; i < FILAS; i++) {
@@ -90,19 +90,19 @@ void inicializar_tablero() {
                     int puntos = rand() % 501 + 2000;  // Entre 2000 y 2500
                     tablero[i][j].plata = 0;
                     tablero[i][j].oro = 0;
-                    tablero[i][j].diamante = puntos / 100;  // 1 diamante = 100 puntos
+                    tablero[i][j].diamante = puntos / 100;  
                 } else if (i == 2) {
-                    // Fila 2: entre 5000 y 10000 puntos
-                    int puntos = rand() % 5001 + 5000;  // Entre 5000 y 10000
+                    // Fila 2: entre 10000 y 20000 puntos
+                    int puntos = rand() % 10001 + 10000;  // Entre 10000 y 20000
                     tablero[i][j].plata = 0;
                     tablero[i][j].oro = 0;
-                    tablero[i][j].diamante = puntos / 100;  // 1 diamante = 100 puntos
+                    tablero[i][j].diamante = puntos / 100;  
                 } else if (i == 3) {
                     // Fila 3: entre 1000 y 1500 puntos
                     int puntos = rand() % 501 + 1000;  // Entre 1000 y 1500
                     tablero[i][j].plata = 0;
                     tablero[i][j].oro = 0;
-                    tablero[i][j].diamante = puntos / 100;  // 1 diamante = 100 puntos
+                    tablero[i][j].diamante = puntos / 100;  
                 }
             }
         }
@@ -220,7 +220,7 @@ void atacar(Recurso *&cabeza_mis_recursos, int x, int y, string &mensaje, Rectan
 
 // Función para mostrar los recursos del jugador
 string mostrar_mis_recursos(Recurso *cabeza_mis_recursos) {
-    Recurso *q = cabeza_mis_recursos;
+    Recurso *q = cabeza_mis_recursos; //Creamos un puntero para que recorra toda la lista
     int puntos_totales = 0;
     string recursos_str = "Tus recursos son:\n";
 
@@ -291,11 +291,11 @@ void actualizarLogros(NodoLogro* raiz, int casillasConquistadas, int puntosTotal
         raiz->desbloqueado = true;
     }
 
-    actualizarLogros(raiz->izq, casillasConquistadas, puntosTotales);
+    actualizarLogros(raiz->izq, casillasConquistadas, puntosTotales); //Recursividad para poder recorrer todo el arbol
     actualizarLogros(raiz->der, casillasConquistadas, puntosTotales);
 }
 
-// Mostrar el árbol de logros en la interfaz gráfica (en lista vertical)
+// Mostrar el árbol de logros en la interfaz gráfica
 void mostrarArbolLogros(NodoLogro* raiz, RenderWindow& window, Font& font, int x, int& y) {
     if (raiz == nullptr) return;
 
@@ -312,7 +312,7 @@ void mostrarArbolLogros(NodoLogro* raiz, RenderWindow& window, Font& font, int x
     y += 30;  // Espaciado vertical de 30 píxeles entre logros
 
     // Dibujar los hijos (recursivamente)
-    mostrarArbolLogros(raiz->izq, window, font, x + 20, y);  // Indentar los hijos
+    mostrarArbolLogros(raiz->izq, window, font, x + 20, y);  
     mostrarArbolLogros(raiz->der, window, font, x + 20, y);
 }
 
@@ -345,16 +345,16 @@ struct Grafo {
         }
 
         // Actualizar la matriz de adyacencia
-        for (int i = 0; i < FILAS; i++) {
-            for (int j = 0; j < COLUMNAS; j++) {
-                int indiceActual = i * COLUMNAS + j;
-                for (int x = 0; x < FILAS; x++) {
+        for (int i = 0; i < FILAS; i++) { //Itera sobre las filas del tablero
+            for (int j = 0; j < COLUMNAS; j++) { //Itera sobre las columnas del tablero
+                int indiceActual = i * COLUMNAS + j; //Calcula el indice actual de la casilla en forma lineal
+                for (int x = 0; x < FILAS; x++) { //Comparar la casilla actual con todas las demas casillas del tablero
                     for (int y = 0; y < COLUMNAS; y++) {
-                        int indiceVecino = x * COLUMNAS + y;
+                        int indiceVecino = x * COLUMNAS + y; //Calcula el indice del vecino en forma lineal
                         if (indiceActual != indiceVecino) {
                             int puntosVecino = calcular_puntos_casilla(x, y);
                             int diferencia = puntosJugador - puntosVecino;
-                            matrizAdyacencia[indiceActual][indiceVecino] = diferencia;
+                            matrizAdyacencia[indiceActual][indiceVecino] = diferencia; // Almacena la diferencia en la matriz de adyacencia
                         }
                     }
                 }
@@ -363,17 +363,17 @@ struct Grafo {
     }
 
     string mostrarCaminosEstrategicos(RectangleShape tableroGrafico[FILAS][COLUMNAS]) {
-        stringstream ss;
+        stringstream ss; //Nos servira para construir cadenas de texto de manera dinamica
         ss << "Aristas desde la casilla [0, 0]:\n";
         int indiceJugador = 0;  // Casilla [0, 0]
 
         for (int i = 0; i < FILAS; i++) {
             for (int j = 0; j < COLUMNAS; j++) {
                 int indiceVecino = i * COLUMNAS + j;
-                if (indiceJugador != indiceVecino) {
-                    int diferencia = matrizAdyacencia[indiceJugador][indiceVecino];
+                if (indiceJugador != indiceVecino) { // Evitar comparar la casilla de inicio consigo misma
+                    int diferencia = matrizAdyacencia[indiceJugador][indiceVecino]; // Obtener la diferencia de puntos desde la casilla [0,0] a la actual
                     ss << " -> Casilla [" << i << ", " << j << "] (Diferencia: " << diferencia << ") ";
-                    if (tableroGrafico[i][j].getFillColor() == Color::Red) {
+                    if (tableroGrafico[i][j].getFillColor() == Color::Red) { // Verificar el estado de la casilla según su color en el tablero
                         ss << "(Casilla ya conquistada)\n";
                     } else if (diferencia > 0) {
                         ss << "(Puedes conquistar)\n";
@@ -384,31 +384,138 @@ struct Grafo {
             }
         }
 
-        return ss.str();
+        return ss.str(); // Retornar el texto generado con los caminos estratégicos
     }
 };
 
 // Función para mostrar la matriz de adyacencia en una nueva ventana
 void mostrarMatrizAdyacencia(Grafo& grafo, RectangleShape tableroGrafico[FILAS][COLUMNAS], Font& font) {
-    RenderWindow matrizWindow(VideoMode(800, 600), "Matriz de Adyacencia");
+    RenderWindow matrizWindow(VideoMode(800, 600), "Matriz de Adyacencia"); //Tamaño de la ventana
     Text texto;
     texto.setFont(font);
-    texto.setCharacterSize(20);
-    texto.setFillColor(Color::White);
+    texto.setCharacterSize(20); //Tamaño del texto
+    texto.setFillColor(Color::White); //Color del texto
 
     while (matrizWindow.isOpen()) {
         Event event;
-        while (matrizWindow.pollEvent(event)) {
-            if (event.type == Event::Closed)
-                matrizWindow.close();
+        while (matrizWindow.pollEvent(event)) { //Manejo de eventos en la ventana
+            if (event.type == Event::Closed) //Si el usuario cierra la ventana
+                matrizWindow.close(); //Cerrar ventana
         }
 
         matrizWindow.clear();
+        //Construir el texto con la matriz de adyacencia
         stringstream ss;
-        ss << grafo.mostrarCaminosEstrategicos(tableroGrafico);
-        texto.setString(ss.str());
-        matrizWindow.draw(texto);
-        matrizWindow.display();
+        ss << grafo.mostrarCaminosEstrategicos(tableroGrafico); //Obtener la informacion del grafo
+        texto.setString(ss.str()); //Asigna el texto generado al objeto de texto
+        matrizWindow.draw(texto); //Dibujar el texto en la ventana
+        matrizWindow.display(); //Mostrar el contenido actualizado en la ventana
+    }
+}
+
+// Estructura para guardar el estado de una casilla antes de un ataque
+struct EstadoCasilla {
+    int x, y; // Coordenadas de la casilla
+    int plata, oro, diamante; // Recursos antes del ataque
+    Color colorOriginal; // Color original de la casilla
+    int plataJugador, oroJugador, diamanteJugador; // Recursos del jugador antes del ataque
+};
+
+// Pila para deshacer accion
+stack<EstadoCasilla> pilaDeshacer;
+
+// Cola para eventos aleatorios
+queue<string> colaEventos;
+
+// Función para deshacer la última acción
+void deshacerAccion(RectangleShape tableroGrafico[FILAS][COLUMNAS], Recurso*& cabeza_mis_recursos, string &mensaje) {
+    if (!pilaDeshacer.empty()) {
+        EstadoCasilla estado = pilaDeshacer.top(); // Obtener el último estado
+        pilaDeshacer.pop(); // Eliminar el estado de la pila
+
+        // Restaurar los recursos de la casilla enemiga
+        tablero[estado.x][estado.y].plata = estado.plata;
+        tablero[estado.x][estado.y].oro = estado.oro;
+        tablero[estado.x][estado.y].diamante = estado.diamante;
+
+        // Restaurar el color original de la casilla
+        tableroGrafico[estado.x][estado.y].setFillColor(estado.colorOriginal);
+
+        // Restaurar los recursos del jugador
+        tablero[0][0].plata = estado.plataJugador;
+        tablero[0][0].oro = estado.oroJugador;
+        tablero[0][0].diamante = estado.diamanteJugador;
+
+        // Eliminar los recursos obtenidos del ataque de la lista del jugador
+        Recurso* q = cabeza_mis_recursos;
+        while (q != NULL) {
+            if (q->tipo == "plata" && q->cantidad == estado.plata) {
+                cabeza_mis_recursos = q->sig;
+                delete q;
+                break;
+            } else if (q->tipo == "oro" && q->cantidad == estado.oro) {
+                cabeza_mis_recursos = q->sig;
+                delete q;
+                break;
+            } else if (q->tipo == "diamante" && q->cantidad == estado.diamante) {
+                cabeza_mis_recursos = q->sig;
+                delete q;
+                break;
+            }
+            q = q->sig;
+        }
+
+        mensaje = "¡Acción deshecha! La casilla [" + to_string(estado.x) + ", " + to_string(estado.y) + "] ha sido restaurada.";
+    } else {
+        mensaje = "No hay acciones para deshacer.";
+    }
+}
+
+// Función para generar un evento aleatorio
+void generarEventoAleatorio(string &mensaje) {
+    string eventos[] = {
+        "Sumar 100 puntos a tu casilla",
+        "Restar 200 puntos a tu casilla",
+        "Sumar 300 puntos a todas las casillas enemigas",
+        "Restar 200 puntos a todas las casillas enemigas"
+    };
+
+    // Si la cola está vacía, rellenarla con los eventos
+    if (colaEventos.empty()) {
+        for (int i = 0; i < 4; i++) {
+            colaEventos.push(eventos[i]);
+        }
+    }
+
+    // Obtener el evento de la cola
+    string evento = colaEventos.front();
+    colaEventos.pop();
+
+    // Ejecutar el evento
+    if (evento == "Sumar 100 puntos a tu casilla") {
+        tablero[0][0].diamante += 1; // Sumar 100 puntos (1 diamante)
+        mensaje = "¡Has ganado 100 puntos!";
+    } else if (evento == "Restar 200 puntos a tu casilla") {
+        tablero[0][0].diamante = max(0, tablero[0][0].diamante - 2); // Restar 200 puntos (2 diamantes)
+        mensaje = "¡Has perdido 200 puntos!";
+    } else if (evento == "Sumar 300 puntos a todas las casillas enemigas") {
+        for (int i = 0; i < FILAS; i++) {
+            for (int j = 0; j < COLUMNAS; j++) {
+                if (!(i == 0 && j == 0)) { // No afectar la casilla del jugador
+                    tablero[i][j].diamante += 3; // Sumar 300 puntos (3 diamantes)
+                }
+            }
+        }
+        mensaje = "¡Todas las casillas enemigas han ganado 300 puntos!";
+    } else if (evento == "Restar 200 puntos a todas las casillas enemigas") {
+        for (int i = 0; i < FILAS; i++) {
+            for (int j = 0; j < COLUMNAS; j++) {
+                if (!(i == 0 && j == 0)) { // No afectar la casilla del jugador
+                    tablero[i][j].diamante = max(0, tablero[i][j].diamante - 2); // Restar 200 puntos (2 diamantes)
+                }
+            }
+        }
+        mensaje = "¡Todas las casillas enemigas han perdido 200 puntos!";
     }
 }
 
@@ -421,31 +528,39 @@ int main() {
     // Lista de recursos del jugador
     Recurso *cabeza_mis_recursos = NULL;
 
-    RenderWindow window(VideoMode(1920, 1080), "Juego - Video de Fondo + Menu Mejorado");
-    vector<Texture> frames;
+    RenderWindow window(VideoMode(1920, 1080), "Juego"); // Crear una ventana con resolución 1920x1080 y título "Juego"
+    vector<Texture> frames; // Vector para almacenar las texturas de los frames
+    // La función getFramesFromFolder("frames") debe devolver un vector de strings con las rutas de los archivos de imagen.
     vector<string> frameFiles = getFramesFromFolder("frames");
-    sort(frameFiles.begin(), frameFiles.end());
+    sort(frameFiles.begin(), frameFiles.end()); // Ordenar los nombres de los archivos en orden ascendente
 
+    // Recorrer cada archivo en el vector ordenado
     for (const auto &file : frameFiles) {
-        Texture texture;
-        if (texture.loadFromFile(file)) {
-            frames.push_back(texture);
+        Texture texture; // Crear una nueva textura
+        if (texture.loadFromFile(file)) { // Intentar cargar la imagen en la textura
+            frames.push_back(texture); // Agregar la textura cargada al vector de frames
         }
     }
 
-    if (frames.empty()) {
+    if (frames.empty()) { //Verificar si esta vacia la carpeta
         cerr << "No se encontraron fotogramas en frames/" << endl;
         return -1;
     }
 
-    Sprite videoSprite;
+    Sprite videoSprite; // Crear un objeto Sprite para representar el video en la pantalla
+    // Ajustar la escala del sprite para que ocupe toda la ventana
+    // Se calcula dividiendo el tamaño de la ventana entre el tamaño del primer frame
     videoSprite.setScale(
         window.getSize().x / (float)frames[0].getSize().x,
         window.getSize().y / (float)frames[0].getSize().y
     );
 
+    // Variable para rastrear el frame actual de la animación
     int currentFrame = 0;
+    // Reloj para medir el tiempo transcurrido entre los cambios de frame
     Clock frameClock;
+    // Definir la tasa de refresco de la animación (FPS)
+    // Se establece en 30 FPS, lo que equivale a un tiempo de cambio de frame de 1/30 segundos
     float frameRate = 1.0f / 30.0f;
 
     // Cargar música
@@ -465,16 +580,19 @@ int main() {
     }
 
     // Configuración del menú
-    string textos[] = {"Ver mis recursos", "Atacar", "Farmear minerales", "Ver logros", "Ver caminos estratégicos", "Salir"};
-    const int numOpciones = 6;  // Aumentamos el número de opciones
-    RectangleShape botones[numOpciones];
-    Text opciones[numOpciones];
-
-    float menuX = 1300, menuY = 200;
-    float tamBotonX = 500, tamBotonY = 110;
-    float separacionBotones = 140;
+    string textos[] = {"Ver mis recursos", "Atacar", "Farmear minerales", "Ver logros", "Ver caminos estratégicos", "Deshacer", "Evento Aleatorio", "Salir"};
+    const int numOpciones = 8;  // Aumentamos el número de opciones
+    RectangleShape botones[numOpciones]; //Para los rectangulos
+    Text opciones[numOpciones]; //Para el texto de los rectangulos
+    // Coordenadas de la esquina superior izquierda del menú en la ventana
+    float menuX = 1300, menuY = 100; 
+    // Dimensiones de los botones del menú
+    float tamBotonX = 400, tamBotonY = 80; // Reducir el tamaño de los botones
+    // Espaciado vertical entre los botones del menú
+    float separacionBotones = 100;
 
     for (int i = 0; i < numOpciones; i++) {
+        //Configurar el tamaño,color,etc
         botones[i].setSize(Vector2f(tamBotonX, tamBotonY));
         botones[i].setFillColor(Color(20, 20, 20, 200));
         botones[i].setOutlineThickness(5);
@@ -483,9 +601,9 @@ int main() {
 
         opciones[i].setFont(font);
         opciones[i].setString(textos[i]);
-        opciones[i].setCharacterSize(32);
+        opciones[i].setCharacterSize(24); // Reducir el tamaño de la fuente
         opciones[i].setFillColor(Color::White);
-        opciones[i].setPosition(menuX + 50, menuY + 35 + i * separacionBotones);
+        opciones[i].setPosition(menuX + 20, menuY + 25 + i * separacionBotones); // Ajustar la posición del texto
     }
 
     // Creación del tablero gráfico
@@ -494,8 +612,11 @@ int main() {
     float tamanoCasilla = 150;
     float espaciado = 15;
     float tiempo = 0;
-
+    // Calcular la posición inicial en el eje X para centrar el tablero horizontalmente,
+    // dividiendo el espacio sobrante en 3 partes para lograr una distribución adecuada.
     float inicioX = (window.getSize().x - (COLUMNAS * (tamanoCasilla + espaciado))) / 3;
+    // Calcular la posición inicial en el eje Y para centrar el tablero verticalmente,
+    // dividiendo el espacio sobrante en 2 partes para alinearlo mejor en la ventana.
     float inicioY = (window.getSize().y - (FILAS * (tamanoCasilla + espaciado))) / 2;
 
     for (int i = 0; i < FILAS; i++) {
@@ -555,11 +676,14 @@ int main() {
 
     while (window.isOpen()) {
         float deltaTime = clock.restart().asSeconds();
-        tiempo += deltaTime;
-
+        tiempo += deltaTime; //Para contar el tiempo
+        // Obtener la posición actual del cursor del mouse dentro de la ventana
         Vector2i mousePos = Mouse::getPosition(window);
+        // Declarar un objeto de tipo Event para manejar eventos de la ventana
         Event event;
+        // Bucle para procesar los eventos de la ventana
         while (window.pollEvent(event)) {
+            // Verificar si el evento detectado es el cierre de la ventana
             if (event.type == Event::Closed)
                 window.close();
 
@@ -586,7 +710,13 @@ int main() {
                         } else if (i == 4) { // Ver caminos estratégicos
                             grafo.actualizarGrafo(tableroGrafico, cabeza_mis_recursos);
                             mostrarMatrizAdyacencia(grafo, tableroGrafico, font);
-                        } else if (i == 5) { // Salir
+                        } else if (i == 5) { // Deshacer
+                            deshacerAccion(tableroGrafico, cabeza_mis_recursos, mensaje);
+                            mensajeText.setString(mensaje);  // Actualizar el mensaje
+                        } else if (i == 6) { // Evento Aleatorio
+                            generarEventoAleatorio(mensaje);
+                            mensajeText.setString(mensaje);  // Actualizar el mensaje
+                        } else if (i == 7) { // Salir
                             window.close();
                         }
                     }
@@ -595,14 +725,29 @@ int main() {
 
             // Capturar entrada de texto para coordenadas
             if (ingresandoCoordenadas && event.type == Event::TextEntered) {
+                // Si se presiona la tecla Backspace y la entrada no está vacía, eliminar el último carácter
                 if (event.text.unicode == '\b' && !coordenadasInput.empty()) { // Tecla Backspace
                     coordenadasInput.pop_back();
                 } else if (event.text.unicode >= '0' && event.text.unicode <= '9' || event.text.unicode == ' ') {
                     coordenadasInput += static_cast<char>(event.text.unicode);
-                } else if (event.text.unicode == '\r') { // Tecla Enter
+                } else if (event.text.unicode == '\r') { // Tecla Enter, Si se presiona la tecla Enter, procesar la entrada y ejecutar la acción de ataque
                     int x, y;
                     stringstream ss(coordenadasInput);
-                    ss >> x >> y;
+                    ss >> x >> y; //Extraer las coordenadas ingresadas
+
+                    // Guardar el estado actual de la casilla antes del ataque
+                    EstadoCasilla estado;
+                    estado.x = x;
+                    estado.y = y;
+                    estado.plata = tablero[x][y].plata;
+                    estado.oro = tablero[x][y].oro;
+                    estado.diamante = tablero[x][y].diamante;
+                    estado.colorOriginal = tableroGrafico[x][y].getFillColor();
+                    estado.plataJugador = tablero[0][0].plata;
+                    estado.oroJugador = tablero[0][0].oro;
+                    estado.diamanteJugador = tablero[0][0].diamante;
+                    pilaDeshacer.push(estado); // Guardar el estado en la pila
+
                     atacar(cabeza_mis_recursos, x, y, mensaje, tableroGrafico); // Llamada a la función atacar
                     ingresandoCoordenadas = false;
                     mensajeText.setString(mensaje);  // Actualizar el mensaje
@@ -619,7 +764,7 @@ int main() {
             felicitaciones.setFont(font);
             felicitaciones.setCharacterSize(48);  // Tamaño de la fuente ajustado
             felicitaciones.setFillColor(Color::Green);
-            felicitaciones.setString("FELICITACIONES ACABASTE EL JUEGO\nJUEGO DESARROLLADO POR VLADIMIR TICONA Y CRISTIAN HUANCA");
+            felicitaciones.setString("FELICITACIONES ACABASTE EL JUEGO\nDESARROLLADO POR VLADIMIR TICONA Y CRISTIAN HUANCA");
 
             // Centrar el texto en la ventana
             FloatRect textRect = felicitaciones.getLocalBounds();
@@ -648,6 +793,7 @@ int main() {
         // Dibujar el tablero con animaciones
         for (int i = 0; i < FILAS; i++) {
             for (int j = 0; j < COLUMNAS; j++) {
+                // Calcular un desplazamiento vertical para generar un efecto de movimiento ondulante
                 float desplazamiento = sin(tiempo * 2 + (i + j) * 0.7) * 8;
                 tableroGrafico[i][j].setPosition(inicioX + j * (tamanoCasilla + espaciado), inicioY + i * (tamanoCasilla + espaciado) + desplazamiento);
                 window.draw(tableroGrafico[i][j]);
@@ -661,7 +807,9 @@ int main() {
         // Dibujar el menú con animaciones
         for (int i = 0; i < numOpciones; i++) {
             float desplazamiento = sin(tiempo * 3 + i) * 10;
+            // Establecer la posición del botón aplicando el desplazamiento en el eje Y
             botones[i].setPosition(menuX, menuY + i * separacionBotones + desplazamiento);
+            // Cambiar el color del contorno del botón si el mouse está sobre él
             botones[i].setOutlineColor(botones[i].getGlobalBounds().contains(mousePos.x, mousePos.y) ? Color::Yellow : Color::Magenta);
             window.draw(botones[i]);
             window.draw(opciones[i]);
@@ -669,7 +817,7 @@ int main() {
 
         // Dibujar mensajes, recursos y coordenadas
         mensajeText.setString(mensaje);  // Actualizar el mensaje
-        window.draw(mensajeText);
+        window.draw(mensajeText); //Dibuja lo que hemos hecho en la ventana
         window.draw(recursosText);
         if (ingresandoCoordenadas) {
             coordenadasText.setString("Ingresa las coordenadas (x y): " + coordenadasInput);
